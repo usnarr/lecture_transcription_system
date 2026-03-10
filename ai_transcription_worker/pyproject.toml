@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "ai-transcription-voice-service"
+version = "0.1.0"
+description = "AI Transcription Voice Service"
+authors = ["usnar"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+celery = "*"
+python-dotenv = "*"
+requests = "*"
+redis = "*"
+flower = "*"
+uvicorn = "*"
+aiohttp = "*"
+sqlalchemy = "*"
+openai = ">=1.0"
+psycopg2-binary = "*"
+psycopg = {extras = ["binary"], version = "*"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

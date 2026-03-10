@@ -1,0 +1,45 @@
+# Logs
+*.log
+logs/
+*.out
+*.err
+venv2
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+.env
+# System files
+.DS_Store
+Thumbs.db
+
+
+.github
+# IDE files
+.vscode/
+.idea/
+
+# Byte-compiled files
+*.swp
+*.swo
+
+# Whisper model cache
+*.pt
+whisper_cache/
+
+# Task queue cache
+*.queue
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+*.swp
+*.swo

@@ -1,0 +1,35 @@
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Whisper model cache
+*.pt
+whisper_cache/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
