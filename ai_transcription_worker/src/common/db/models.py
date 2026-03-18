@@ -16,6 +16,12 @@ class TaskStatusEnum(str, enum.Enum):
     SUCCESS = "success"
     FAIL = "fail"
 
+class TaskStatusID:
+    """Database IDs for task statuses (from init.sql seed order)."""
+    PENDING = 1
+    SUCCESS = 2
+    FAIL = 3
+
 class TaskStatus(Base):
     __tablename__ = "task_statuses"
     

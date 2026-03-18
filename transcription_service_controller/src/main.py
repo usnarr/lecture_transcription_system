@@ -78,7 +78,7 @@ async def add_transcription(payload: TranscriptionInsertRequest):
         }
     except Exception as e:
         logger.error(f"Failed to store transcription: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to store transcription: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to store transcription")
 
 
 @app.get("/transcriptions/{transcription_id}", response_model=GetTranscriptionOut)
@@ -99,6 +99,6 @@ async def get_transcription(transcription_id: str):
         raise
     except Exception as e:
         logger.error(f"Failed to retrieve transcription: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve transcription: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve transcription")
 
 

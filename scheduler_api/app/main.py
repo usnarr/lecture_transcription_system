@@ -6,6 +6,9 @@ from app.db.database import get_db_connection
 from app.db.repository import LectureRepository
 from app.db.service import LectureService
 import psycopg
+import logging
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -27,7 +30,8 @@ async def create_lecture(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating lecture: {str(e)}")
+        logger.error(f"Error creating lecture: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/schedule/transcription-task")
 async def schedule_transcription_task(task_req: TranscriptionTaskRequest):
@@ -38,7 +42,8 @@ async def schedule_transcription_task(task_req: TranscriptionTaskRequest):
         )
         return {"message": "Transcription task scheduled", "task_id": str(task_id)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error scheduling transcription task: {str(e)}")
+        logger.error(f"Error scheduling transcription task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to schedule transcription task")
 
 @app.post("/schedule/ai-transcription-task")
 async def schedule_ai_transcription_task(task_req: AiTranscriptionTaskRequest):
@@ -49,7 +54,8 @@ async def schedule_ai_transcription_task(task_req: AiTranscriptionTaskRequest):
         )
         return {"message": "AI Transcription task scheduled", "task_id": str(task_id)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error scheduling AI transcription task: {str(e)}")
+        logger.error(f"Error scheduling AI transcription task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to schedule AI transcription task")
     
 @app.post("/processing/regenerate-summary")
 async def regenerate_summary(task_req:RegenerateSummaryRequest):
@@ -60,4 +66,5 @@ async def regenerate_summary(task_req:RegenerateSummaryRequest):
         )
         return {"message": "Summary regeneration task scheduled", "task_id": str(task_id)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error scheduling summary regeneration task: {str(e)}")
+        logger.error(f"Error scheduling summary regeneration task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to schedule summary regeneration task")

@@ -21,9 +21,7 @@ class Controller:
         self.ai_task_semaphore = asyncio.Semaphore(2)
 
     async def run_transcription_task(self, task_id: str, lecture_ids: list):
-        processing_data = []
-        
-        async for connection in get_db_connection():
+        async with get_db_connection() as connection:
             db_repo = LectureDBRepository(connection)
             processing_data = await ProcessingPathsCollectorService(
                 repo=db_repo, 
@@ -42,14 +40,22 @@ class Controller:
             )
             for lecture_id, file_path, _ in processing_data
         ]
-        await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        return {"status": "Transcription task executed successfully!"}
+        failed = []
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                lecture_id = processing_data[i][0]
+                logger.error(f"Failed to process lecture {lecture_id}: {result}")
+                failed.append({"lecture_id": lecture_id, "error": str(result)})
+        
+        return {
+            "status": "Transcription task completed." if not failed else "Transcription task completed with errors.",
+            "failed": failed,
+        }
     
     async def run_ai_transcription_task(self, task_id: str, lecture_ids: list):
-        processing_data = []
-        
-        async for connection in get_db_connection():
+        async with get_db_connection() as connection:
             db_repo = LectureDBRepository(connection)
             processing_data = await ProcessingPathsCollectorService(
                 repo=db_repo, 
@@ -69,13 +75,23 @@ class Controller:
             )
             for lecture_id, file_path, lecture_type_id in processing_data
         ]
-        await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        return {"status": "AI Transcription task executed successfully!"}
+        failed = []
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                lecture_id = processing_data[i][0]
+                logger.error(f"Failed to process AI lecture {lecture_id}: {result}")
+                failed.append({"lecture_id": lecture_id, "error": str(result)})
+        
+        return {
+            "status": "AI Transcription task completed." if not failed else "AI Transcription task completed with errors.",
+            "failed": failed,
+        }
     
     async def process_single_lecture(self, file_path: str, task_id: str, lecture_id: int):
         async with self.task_semaphore:
-            async for connection in get_db_connection():
+            async with get_db_connection() as connection:
                 logger.info(f"Starting processing for Lecture {task_id} with file {file_path}")
                 db_repo = LectureDBRepository(connection)
                 transcription_service = TranscriptionService(db_repo=db_repo)
@@ -89,7 +105,7 @@ class Controller:
 
     async def process_single_ai_lecture(self, file_path: str, task_id: str, lecture_id: int, lecture_type_id: int):
         async with self.ai_task_semaphore:
-            async for connection in get_db_connection():
+            async with get_db_connection() as connection:
                 logger.info(f"Starting AI processing for Lecture {task_id} with file {file_path}")
                 db_repo = LectureDBRepository(connection)
                 ai_transcription_service = AiTranscriptionService(db_repo=db_repo)
@@ -101,11 +117,11 @@ class Controller:
                 
                 return {"status": f"AI Lecture {task_id} processed successfully."}
             
-    async def _regenerate_single_summary(self, task_id: str, new_prompt: str):
-        async for connection in get_db_connection():
+    async def _regenerate_single_summary(self, task_id: int, new_prompt: str):
+        async with get_db_connection() as connection:
             db_repo = LectureDBRepository(connection)
             service = RegenerateSummaryService(db_repo=db_repo)
-            lecture_type = await db_repo.get_lecture_type_by_task_id(task_id)
+            lecture_type = await db_repo.get_lecture_type_by_db_task_id(task_id)
             
             messages = {
                 "system": await db_repo.get_system_message(lecture_type_id=lecture_type),

@@ -43,7 +43,7 @@ class ControllerService:
         )
 
         task = celery_app.send_task(
-            "transcription_service.worker.tasks.transcribe_task",
+            "transcribe_audio",
             kwargs={
                 "file_path": file_path,
                 "model_size": model_size,             
@@ -76,7 +76,9 @@ class ControllerService:
                             status_code=404,
                             detail=f"Task '{task_id}' not found"
                         )
-                except:
+                except HTTPException:
+                    raise
+                except Exception:
                     raise HTTPException(
                         status_code=404,
                         detail=f"Task '{task_id}' not found"

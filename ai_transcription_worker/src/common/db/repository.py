@@ -59,6 +59,19 @@ class LectureDBRepository:
             await cur.execute(query, (task_id,))
             row = await cur.fetchone()
             return row[0] if row else None
+
+    async def get_lecture_type_by_db_task_id(self, task_id: int):
+        """Get lecture type by task database ID"""
+        query = """
+            SELECT l.lecture_type
+            FROM public.lectures l
+            JOIN public.tasks t ON l.task_id = t.id
+            WHERE t.id = %s
+        """
+        async with self.conn.cursor() as cur:
+            await cur.execute(query, (task_id,))
+            row = await cur.fetchone()
+            return row[0] if row else None
     
     async def save_transcription(self, transcription: str):
         """Save transcription and return the created record"""
